@@ -48,16 +48,19 @@
       <div class="btns-row nm">
         @currentAuth() { auth =>
           @if(auth == null) {
+          	<!-- 
             @if(isSocialLoginSupport) {
               @if(!UserApp.useSocialLoginOnly) {
                 <div class="social-login-title-line"> @Messages("title.or") </div>
               }
+               
             }
             @forProviders() { p =>
               @if(isAllowedOAuthProvider(p.getKey)) {
                 <a href="@p.getUrl" class="ybtn oauth-login-btn">@Html(providerWithLogo(p.getKey))</a>
               }
             }
+            -->
           } else {
             @if(UserApp.currentUser().isAnonymous){
               <div class="cache-warning">@Messages("browser.cache.refresh.message")</div>
@@ -74,8 +77,11 @@
           </div>
 
           <a href="@routes.PasswordResetApp.lostPassword()">@Messages("title.resetPassword")</a>
+          <!-- 
           <span class="gray-txt ml10 mr10">|</span>
+          
           <a href="@routes.UserApp.signupForm">@Messages("title.signup")</a>
+           -->
         </div>
       }
       </form>

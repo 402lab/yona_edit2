@@ -367,7 +367,8 @@ public class UserApp extends Controller {
     }
 
     public static Result signupForm() {
-        if(!UserApp.currentUser().isAnonymous()) {
+    	//siteManager 일시 가입 접속 허가
+        if(!UserApp.currentUser().isSiteManager()) {
             return redirect(routes.Application.index());
         }
 
@@ -447,10 +448,11 @@ public class UserApp extends Controller {
       if (new_user.state == UserState.LOCKED && isUsingSignUpConfirm()) {
             flash(Constants.INFO, "user.signup.requested");
       } else {
-            addUserInfoToSession(new_user);
+            //addUserInfoToSession(new_user);
         }
        
-        return redirect(routes.Application.index());
+      flash(Constants.INFO, "가입 처리가 성공적으로  완료되었습니다.");
+      return redirect(routes.UserApp.signupForm());
     }
     
     private static String newLoginIdWithoutDup(final String candidate, int num) {
@@ -1054,7 +1056,7 @@ public class UserApp extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result isEmailExist(String email) {
         ObjectNode result = Json.newObject();
-        result.put("isExist", User.isEmailExist(email));
+        result.put("isExist", false);
         return ok(result);
     }
 

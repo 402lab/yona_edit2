@@ -37,6 +37,7 @@
       <p>@Html(Messages("title.signupConfirmDesc2", new StringBuilder(User.findByLoginId(SiteAdmin.SITEADMIN_DEFAULT_LOGINID).email).reverse().toString()))</p>
     </div>
   }
+   
   <div class="signup-form-wrap frm-wrap">
     <form action="@routes.UserApp.newUser()" method="post" name="signup">
     @if(UserApp.useSocialLoginOnly) {
@@ -95,14 +96,13 @@
 </div>
 
 <script type="text/javascript" src="@routes.Assets.at("javascripts/lib/validate.js")"></script>
-<!--  
+
 <script type="text/javascript">
     $(document).ready(function() {
         $yobi.loadModule("user.SignUp", {
-            "sLogindIdCheckUrl" : "@routes.UserApp.isUsed("")",
-            "sEmailCheckUrl" : "@routes.UserApp.isEmailExist("")"
+            "sLogindIdCheckUrl" : "@routes.UserApp.isUsed("")"
         });
     });
 </script>
--->
+
 }

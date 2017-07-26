@@ -46,7 +46,7 @@
         <button type="submit" class="ybtn ybtn-primary ybtn-large ybtn-fullsize">@Messages("button.login")</button>
       </div>
       }
-
+<!--  
       <div class="btns-row nm">
       @currentAuth() { auth =>
         @if(auth == null) {
@@ -62,6 +62,7 @@
           }
         }
       }
+      
       </div>
       @if(!UserApp.useSocialLoginOnly) {
       <div class="act-row mt5">
@@ -69,12 +70,13 @@
           <input id="remember-me" type="checkbox" name="rememberMe" class="checkbox" checked>
           <label for="remember-me" class="bg-checkbox">@Messages("title.rememberMe")</label>
         </div>
-
+-->
         <div class="links-wrap pull-right">
           <a href="@routes.PasswordResetApp.lostPassword">@Messages("title.forgotpassword")</a>
         </div>
       </div>
       }
+      
     </form>
   </div>
 </div>

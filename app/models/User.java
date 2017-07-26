@@ -450,9 +450,12 @@ public class User extends Model implements ResourceConvertible {
      * @param emailAddress
      * @return boolean
      */
+    
+    //커스텀은 이메일을 삭제했기 때문에 검사를 뺍니다.
     public static boolean isEmailExist(String emailAddress) {
-        User user = find.where().ieq("email", emailAddress).findUnique();
-        return user != null || Email.exists(emailAddress, true);
+       // User user = find.where().ieq("email", emailAddress).findUnique();
+       // return user != null || Email.exists(emailAddress, true);
+    	return false;
     }
 
     /**
