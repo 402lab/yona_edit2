@@ -430,7 +430,11 @@ public class UserApp extends Controller {
       } else {
            new_user.state = UserState.ACTIVE;
       }
-      User.create(new_user);
+      if(User.create(new_user)==null) {
+    	  flash(Constants.INFO, "이미 존재하는 아이디 입니다");
+    	  return redirect(routes.UserApp.signupForm());
+      }
+      
       Email.deleteOtherInvalidEmails(new_user.email);
       if (isUsingEmailVerification()) {
             UserVerification.newVerification(new_user);
@@ -1056,7 +1060,7 @@ public class UserApp extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result isEmailExist(String email) {
         ObjectNode result = Json.newObject();
-        result.put("isExist", false);
+        result.put("isExist", User.isEmailExist(email));
         return ok(result);
     }
 
@@ -1098,6 +1102,7 @@ public class UserApp extends Controller {
         email.email = newEmail;
         email.valid = false;
 
+        
         user.addEmail(email);
 
         return redirect(routes.UserApp.editUserInfoForm());

@@ -251,7 +251,12 @@ public class User extends Model implements ResourceConvertible {
     public static Long create(User user) {
         user.createdDate = JodaDateUtil.now();
         user.name = defaultSanitize(user.name);
-        user.save();
+        try{
+        	user.save();
+        }
+        catch(Exception ex) {
+        	return null;
+        }
         CacheStore.yonaUsers.put(user.id, user);
         return user.id;
     }
