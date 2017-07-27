@@ -367,13 +367,14 @@ public class UserApp extends Controller {
     }
 
     public static Result signupForm() {
-        if(!UserApp.currentUser().isAnonymous()) {
+    	//siteManager 일시 가입 접속 허가
+        if(!UserApp.currentUser().isSiteManager()) {
             return redirect(routes.Application.index());
         }
 
         return ok(signup.render("title.signup", form(User.class)));
     }
-
+/*
     @Transactional
     public static Result newUser() {
         Form<User> newUserForm = form(User.class).bindFromRequest();
@@ -403,7 +404,61 @@ public class UserApp extends Controller {
         }
         return redirect(routes.Application.index());
     }
-
+*/
+    @Transactional
+    public static Result newUser(){
+	  Form<User> newUserForm = form(User.class).bindFromRequest();
+      validate(newUserForm);
+      
+	  User new_user = new User();
+       
+      new_user.loginId = newUserForm.get().loginId;
+      new_user.name = newUserForm.get().name;
+      new_user.email = newUserForm.get().loginId+"@ntsys.co.kr";
+      new_user.lang = "ko-KR";
+      new_user.rememberMe = false;
+      new_user.lastStateModifiedDate = null;
+      Date dt = new Date();
+      new_user.createdDate = dt;
+      new_user.token=null;
+   
+      RandomNumberGenerator rng = new SecureRandomNumberGenerator();
+      new_user.passwordSalt = rng.nextBytes().toBase64();
+      new_user.password = hashedPassword("1234", new_user.passwordSalt);
+      if (isUsingSignUpConfirm() || isUsingEmailVerification()) {
+      new_user.state = UserState.LOCKED;
+      } else {
+           new_user.state = UserState.ACTIVE;
+      }
+      if(User.create(new_user)==null) {
+    	  flash(Constants.INFO, "이미 존재하는 아이디 입니다");
+    	  return redirect(routes.UserApp.signupForm());
+      }
+      
+      Email.deleteOtherInvalidEmails(new_user.email);
+      if (isUsingEmailVerification()) {
+            UserVerification.newVerification(new_user);
+            sendMailAfterUserCreation(new_user);
+      }
+        
+       
+      if (isUsingEmailVerification()) {
+          if (isAllowedEmailDomains(new_user.email)) {
+                flash(Constants.INFO, "user.verification.mail.sent");
+            } else {
+                flash(Constants.INFO, "user.unacceptable.email.domain");
+            }
+        }
+      if (new_user.state == UserState.LOCKED && isUsingSignUpConfirm()) {
+            flash(Constants.INFO, "user.signup.requested");
+      } else {
+            //addUserInfoToSession(new_user);
+        }
+       
+      flash(Constants.INFO, "가입 처리가 성공적으로  완료되었습니다.");
+      return redirect(routes.UserApp.signupForm());
+    }
+    
     private static String newLoginIdWithoutDup(final String candidate, int num) {
         String newLoginIdSuggestion = candidate + "" + num;
         if(User.findByLoginId(newLoginIdSuggestion).isAnonymous()){
@@ -455,6 +510,7 @@ public class UserApp extends Controller {
     }
 
     private static User createUserDelegate(CandidateUser candidateUser) {
+        // . is replaced with - because of BasicAuth parsing case with id
         String loginIdCandidate = candidateUser.getLoginId();
 
         User user = new User();
@@ -474,7 +530,6 @@ public class UserApp extends Controller {
             user.password = candidateUser.getPassword();
         }
 
-        user.isGuest = candidateUser.isGuest();
         return createNewUser(user);
     }
 
@@ -1047,6 +1102,7 @@ public class UserApp extends Controller {
         email.email = newEmail;
         email.valid = false;
 
+        
         user.addEmail(email);
 
         return redirect(routes.UserApp.editUserInfoForm());
@@ -1084,7 +1140,7 @@ public class UserApp extends Controller {
 
         email.sendValidationEmail();
 
-        flash(Constants.WARNING, "확인 메일을 전송했습니다.");
+        flash(Constants.WARNING, "�솗�씤 硫붿씪�쓣 �쟾�넚�뻽�뒿�땲�떎.");
         return redirect(routes.UserApp.editUserInfoForm());
     }
 
@@ -1148,10 +1204,20 @@ public class UserApp extends Controller {
         try {
             LdapUser ldapUser = ldapService.authenticate(loginIdOrEmail, password);
             play.Logger.debug("l: " + ldapUser);
-
             User localUserFoundByLdapLogin = User.findByEmail(ldapUser.getEmail());
             if (localUserFoundByLdapLogin.isAnonymous()) {
-                return createNewUser(password, ldapUser);
+                CandidateUser candidateUser = new CandidateUser(
+                        ldapUser.getDisplayName(),
+                        ldapUser.getEmail(),
+                        ldapUser.getUserLoginId(),
+                        password
+                );
+                User created = createUserDelegate(candidateUser);
+                if (created.state == UserState.LOCKED) {
+                    flash(Constants.INFO, "user.signup.requested");
+                    return User.anonymous;
+                }
+                return created;
             } else {
                 if(!localUserFoundByLdapLogin.isSamePassword(password)) {
                     User.resetPassword(localUserFoundByLdapLogin.loginId, password);
@@ -1159,7 +1225,6 @@ public class UserApp extends Controller {
 
                 localUserFoundByLdapLogin.refresh();
                 localUserFoundByLdapLogin.name = ldapUser.getDisplayName();
-                localUserFoundByLdapLogin.isGuest = ldapUser.isGuestUser();
                 localUserFoundByLdapLogin.update();
                 return localUserFoundByLdapLogin;
             }
@@ -1180,22 +1245,6 @@ public class UserApp extends Controller {
             e.printStackTrace();
             return User.anonymous;
         }
-    }
-
-    private static User createNewUser(String password, LdapUser ldapUser) {
-        CandidateUser candidateUser = new CandidateUser(
-                ldapUser.getDisplayName(),
-                ldapUser.getEmail(),
-                ldapUser.getUserLoginId(),
-                password,
-                ldapUser.isGuestUser()
-        );
-        User created = createUserDelegate(candidateUser);
-        if (created.state == UserState.LOCKED) {
-            flash(Constants.INFO, "user.signup.requested");
-            return User.anonymous;
-        }
-        return created;
     }
 
     public static boolean isUsingSignUpConfirm(){
@@ -1226,18 +1275,7 @@ public class UserApp extends Controller {
             newUserForm.reject("loginId", "user.wrongloginId.alert");
         }
 
-        if (newUserForm.field("password").value().trim().isEmpty()) {
-            newUserForm.reject("password", "user.wrongPassword.alert");
-        }
-
-        if (User.isLoginIdExist(newUserForm.field("loginId").value())
-            || Organization.isNameExist(newUserForm.field("loginId").value())) {
-            newUserForm.reject("loginId", "user.loginId.duplicate");
-        }
-
-        if (User.isEmailExist(newUserForm.field("email").value())) {
-            newUserForm.reject("email", "user.email.duplicate");
-        }
+       
     }
 
     public static User createNewUser(User user) {
@@ -1366,4 +1404,9 @@ public class UserApp extends Controller {
     public static Result usermenuTabContentList(){
         return ok(views.html.common.usermenu_tab_content_list.render());
     }
-}
+    
+  //커스텀
+
+    
+    
+}  

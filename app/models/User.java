@@ -182,8 +182,6 @@ public class User extends Model implements ResourceConvertible {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     public List<OrganizationUser> organizationUsers;
 
-    public boolean isGuest = false;
-
     public User() {
     }
 
@@ -253,7 +251,12 @@ public class User extends Model implements ResourceConvertible {
     public static Long create(User user) {
         user.createdDate = JodaDateUtil.now();
         user.name = defaultSanitize(user.name);
-        user.save();
+        try{
+        	user.save();
+        }
+        catch(Exception ex) {
+        	return null;
+        }
         CacheStore.yonaUsers.put(user.id, user);
         return user.id;
     }
@@ -377,11 +380,7 @@ public class User extends Model implements ResourceConvertible {
         ExpressionList<User> el = User.find.where();
         el.ne("id",SITE_MANAGER_ID);
         el.ne("loginId",anonymous.loginId);
-        if( state == UserState.GUEST ) {
-            el.eq("isGuest", true);
-        } else {
-            el.eq("state", state);
-        }
+        el.eq("state", state);
 
         if(StringUtils.isNotBlank(query)) {
             el = el.disjunction();
@@ -456,9 +455,12 @@ public class User extends Model implements ResourceConvertible {
      * @param emailAddress
      * @return boolean
      */
+    
+    //커스텀은 이메일을 삭제했기 때문에 검사를 뺍니다.
     public static boolean isEmailExist(String emailAddress) {
-        User user = find.where().ieq("email", emailAddress).findUnique();
-        return user != null || Email.exists(emailAddress, true);
+       // User user = find.where().ieq("email", emailAddress).findUnique();
+       // return user != null || Email.exists(emailAddress, true);
+    	return false;
     }
 
     /**
@@ -538,8 +540,11 @@ public class User extends Model implements ResourceConvertible {
     }
 
     public boolean isMemberOf(Project project) {
-        // TODO: Performance! Removed cache. If performance problem is occurred, fix it!
-        return ProjectUser.isMember(id, project.id);
+        if (!projectMembersMemo.containsKey(project.id)) {
+            projectMembersMemo.put(project.id, ProjectUser.isMember(id, project.id));
+        }
+
+        return projectMembersMemo.get(project.id);
     }
 
     public List<Project> getEnrolledProjects() {

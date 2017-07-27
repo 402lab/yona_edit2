@@ -21,21 +21,6 @@ application.siteName="Yona"
 # want to allow that, set signup.require.confirm to true.
 application.allowsAnonymousAccess=true
 
-# Guest User Id Rule
-# ~~~~~~~~~~~~~
-# If login id is created with following prefixes,
-# Yona treat that user is Guest User.
-# Guest user is extremely restricted in use of Yona.
-# They can not see any project listing of instance and
-# only create own account's projects.
-# In other words, they cannot create organization.
-# If multiple prefixes are needed, user , (comma)
-#
-# eg.
-# "PT_, GUEST_"
-
-application.guest.user.login.id.prefix = ""
-
 #
 # Signup options
 # ~~~~~~~~~~~~~~
@@ -128,7 +113,7 @@ ebeanconfig.datasource.default=default
 db.default.driver=org.mariadb.jdbc.Driver
 db.default.url="jdbc:mariadb://127.0.0.1:3306/yona?useServerPrepStmts=true"
 db.default.user=yona
-db.default.password="password"
+db.default.password="yonadan"
 
 # Local
 # db.default.url="jdbc:postgresql://localhost:5432/yona"
@@ -298,9 +283,6 @@ application.noreferrer = true
 
 # Display private repositories in the list
 application.displayPrivateRepositories = false
-
-# Hide project listing for security
-application.hide.project.listing = false
 
 # choice: "public" or "private"
 # default: "public"

@@ -1,3 +1,4 @@
+
 # Messages
 #
 # list of namespace
@@ -79,8 +80,6 @@ button.submitForm = 폼 전송
 button.upload = 파일 올리기
 button.user.makeAccountUnlock.false = 계정잠그기
 button.user.makeAccountUnlock.true = 잠김해제
-button.user.make.guest.mode = 게스트로 전환
-button.user.make.normal.mode = 일반으로 전환
 button.yes = 예
 change.added = 추가
 change.deleted = 삭제
@@ -213,7 +212,6 @@ error.failedTo = {0}에 실패했습니다.<br>({1} {2})
 error.forbidden = 권한이 없습니다
 error.forbidden.or.notfound = 권한이 없거나 존재하지 않는 프로젝트입니다.
 error.forbidden.or.not.allowed = 권한이 없거나 허용하지 않는 요청입니다.
-error.forbidden.to.guest.user = 게스트 유저에게는 허용하지 않는 요청입니다
 error.timeout = 요청 처리가 너무 오래 걸려 중단되었습니다
 error.internalServerError = 서버 오류가 발생하여 서비스를 이용할 수 없습니다
 error.notfound = 페이지를 찾을 수 없습니다
@@ -865,7 +863,6 @@ site.user.delete = 사용자 삭제
 site.user.deleteConfirm = 정말로 해당 사용자를 사이트에서 탈퇴시키겠습니까?
 site.userList.deleteAlert = 프로젝트의 유일한 관리자이므로 사이트에서 삭제할 수 없습니다.
 site.userList.deleted = 삭제된 사용자
-site.userList.guest = 게스트 사용자
 site.userList.locked = 계정이 잠긴 사용자
 site.userList.search = 찾으려는 사용자의 ID, 이름 또는 이메일을 입력하세요
 site.userList.unlocked = 활성화된 사용자
@@ -925,8 +922,8 @@ title.resetPasswordFor = <span class="highlight">{0}</span> 비밀번호 재설�
 title.search = 검색
 title.searchByKeyword = 키워드로 검색
 title.sendMail = 메일 발송
-title.signup = 멤버 가입
-title.signupFor = <span class="highlight">{0}</span> 멤버 가입
+title.signup = 멤버 추가
+title.signupFor = <span class="highlight">{0}</span> 멤버 추가
 title.signupConfirmDesc = 가입 후 사용을 위해서는 관리자의 승인이 필요합니다
 title.signupConfirmDesc2 = <span class="obfuscate">{0}</span>으로 문의하세요
 title.siteSetting = 사이트 설정
@@ -988,7 +985,7 @@ user.role.org_member = 그룹 구성원
 user.role.owner =  프로젝트 소유자
 user.role.sitemanager = 사이트 관리자
 user.signup.requested = 가입 요청을 보냈습니다. 사이트 관리자가 검토/승인 후 사용가능합니다. 감사합니다.
-user.signupBtn = 참여하기
+user.signupBtn = 추가하기
 user.signupId = 아이디
 user.verification.mail.sent = 사용자 정보 확인을 위한 메일을 보냈습니다
 user.verification = 사용자 정보 확인
