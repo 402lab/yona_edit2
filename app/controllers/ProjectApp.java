@@ -10,6 +10,7 @@ import actions.DefaultProjectCheckAction;
 import com.avaje.ebean.*;
 
 import controllers.annotation.AnonymousCheck;
+import controllers.annotation.GuestProhibit;
 import controllers.annotation.IsAllowed;
 import info.schleichardt.play2.mailplugin.Mailer;
 import models.*;
@@ -794,7 +795,7 @@ public class ProjectApp extends Controller {
     private static void collectedUsersToMentionList(List<Map<String, String>> users, List<User> userList) {
         for (User user: userList) {
             Map<String, String> projectUserMap = new HashMap<>();
-            if (user != null && !user.loginId.equals(Constants.ADMIN_LOGIN_ID)) {
+            if (user != null && StringUtils.isNotEmpty(user.loginId) && !user.loginId.equals(Constants.ADMIN_LOGIN_ID)) {
                 projectUserMap.put("loginid", user.loginId);
                 projectUserMap.put("searchText", user.name + user.loginId);
                 projectUserMap.put("name", user.name);
@@ -956,6 +957,7 @@ public class ProjectApp extends Controller {
      * @param pageNum the page num
      * @return
      */
+    @GuestProhibit
     public static Result projects(String query, int pageNum) {
         if(Application.HIDE_PROJECT_LISTING){
             return forbidden(ErrorViews.Forbidden.render("error.auth.unauthorized.waringMessage"));

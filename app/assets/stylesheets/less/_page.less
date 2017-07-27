@@ -4936,12 +4936,25 @@ label.issue-item-row {
         }
 
         .listitem-col {
-            padding: 5px 10px;
-            overflow: hidden;
+            font-size: 12px;
+            padding: 10px 0;
             text-overflow: ellipsis;
-            white-space: nowrap;
             word-break : break-all;
-            line-height: 50px;
+            line-height: 20px;
+            .user-id {
+                font-size: 13px;
+            }
+            .email {
+                font-size: 13px;
+                line-height: 43px;
+            }
+            .created-date {
+                padding: 0;
+                line-height: 30px;
+            }
+            &.action-buttons {
+                padding-top: 0;
+            }
         }
 
         &:nth-child(even) {
@@ -6864,4 +6877,12 @@ div.diff-body[data-outdated="true"] tr:hover .icon-comment {
 
 .myissues-search-input {
     margin: 20px 0 20px;
+}
+
+.project-protected {
+    background-color: #00bcd4;
+    border-radius: 2px;
+    font-size: 15px;
+    color: rgba(0, 0, 0, 0.7);
+    padding: 0 2px;
 }
